@@ -1,7 +1,6 @@
 package rpc
 
 import (
-	"fmt"
 	"github.com/google/wire"
 	"github.com/pkg/errors"
 	rpcxServer "github.com/smallnest/rpcx/server"
@@ -40,8 +39,6 @@ func NewServerOptions(v *viper.Viper) (*ServerOptions, error) {
 type Server struct {
 	opt      *ServerOptions
 	app      string
-	host     string
-	port     int
 	logger   *zap.Logger
 	server   *rpcxServer.Server
 	initFunc InitServers
@@ -75,7 +72,7 @@ func (s *Server) ApplicationName(name string) {
 func (s *Server) Start(ln net.Listener) error {
 	s.logger.Info("rpc server starting ...")
 
-	if err := s.register(); err != nil {
+	if err := s.register(ln.Addr().String()); err != nil {
 		return errors.Wrap(err, "register rpc server error")
 	}
 
@@ -91,9 +88,7 @@ func (s *Server) Start(ln net.Listener) error {
 	return nil
 }
 
-func (s *Server) register() error {
-	addr := fmt.Sprintf("%s:%d", s.host, s.port)
-
+func (s *Server) register(addr string) error {
 	r := &serverplugin.EtcdV3RegisterPlugin{
 		ServiceAddress: "tcp@" + addr,
 		EtcdServers:    s.opt.EtcdAddress,

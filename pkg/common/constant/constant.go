@@ -8,3 +8,6 @@ package constant
  * @Desc:
  */
 
+const (
+	TokenType = "Bearer"
+)
