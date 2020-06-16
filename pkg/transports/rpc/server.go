@@ -55,6 +55,7 @@ func NewServer(opt *ServerOptions, logger *zap.Logger, init InitServers) (*Serve
 	logger = logger.With(zap.String("type", "rpcx"))
 	{
 		s = rpcxServer.NewServer()
+		s.DisableHTTPGateway = true
 	}
 
 	return &Server{
