@@ -25,6 +25,7 @@ import (
 从配置文件中获取 key: http
 */
 type Options struct {
+	Name string
 	Mode string
 }
 
@@ -38,7 +39,7 @@ func NewOptions(v *viper.Viper) (*Options, error) {
 	return opt, nil
 }
 
-type InitControllers func(r *gin.Engine)
+type InitControllers func(r *gin.RouterGroup)
 
 /**
 初始化http服务器
@@ -56,7 +57,7 @@ func NewRouter(opt *Options, logger *zap.Logger, init InitControllers) *gin.Engi
 	r.Use(ginzap.Ginzap(logger, time.RFC3339, true))
 	r.Use(ginzap.RecoveryWithZap(logger, true))
 
-	init(r)
+	init(r.Group(opt.Name))
 
 	return r
 }
