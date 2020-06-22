@@ -41,10 +41,12 @@ func NewOptions(v *viper.Viper) (*Options, error) {
 
 type InitControllers func(r *gin.RouterGroup)
 
+type Middleware func(r *gin.Engine)
+
 /**
 初始化http服务器
 */
-func NewRouter(opt *Options, logger *zap.Logger, init InitControllers) *gin.Engine {
+func NewRouter(opt *Options, logger *zap.Logger, init InitControllers, mid Middleware) *gin.Engine {
 	gin.SetMode(opt.Mode)
 
 	r := gin.New()
@@ -56,6 +58,8 @@ func NewRouter(opt *Options, logger *zap.Logger, init InitControllers) *gin.Engi
 	r.Use(gin.Recovery())
 	r.Use(ginzap.Ginzap(logger, time.RFC3339, true))
 	r.Use(ginzap.RecoveryWithZap(logger, true))
+
+	mid(r)
 
 	init(r.Group(opt.Name))
 
